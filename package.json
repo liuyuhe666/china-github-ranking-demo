@@ -52,7 +52,7 @@
   },
   "packageManager": "pnpm@9.6.0",
   "lint-staged": {
-    "*": [
+    "*.{ts,tsx,js,jsx,mdx}": [
       "pnpm run format:write"
     ]
   }
