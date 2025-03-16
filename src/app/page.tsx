@@ -1,10 +1,24 @@
-import { api, HydrateClient } from "~/trpc/server";
+import { HydrateClient, api } from "~/trpc/server";
 import { Ranking } from "./_components/ranking";
 import { BackToTop } from "./_components/back-to-top";
+
+// 使用动态渲染，避免构建时预渲染
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Home() {
-  const pageNumber = 1;
-  const pageSize = 50;
-  void api.github.getChinaGitHubRankingData.prefetch({ pageNumber, pageSize });
+  try {
+    await Promise.all([
+      api.github.getChinaGitHubRankingData.prefetch({
+        pageNumber: 1,
+        pageSize: 50,
+      }),
+      api.github.getChinaGitHubRankingDataTotal.prefetch(),
+    ]);
+  } catch (error) {
+    console.error("Failed to prefetch data:", error);
+    // 继续渲染页面，让客户端重试数据获取
+  }
 
   return (
     <HydrateClient>
